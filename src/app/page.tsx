@@ -1,8 +1,6 @@
+import "reflect-metadata"
 import Layout from './components/Layout'
 import Link from './components/Link'
-import { JobApplication } from './core/models/job-application'
-
-
 
 export default function Home() {
   return (
