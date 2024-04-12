@@ -4,7 +4,7 @@ import Title from './Title'
 interface Props {
     title: string
     toGoBack?: string
-    children: any
+    children: React.ReactNode
 }
 
 export default function Layout(props: Props) {

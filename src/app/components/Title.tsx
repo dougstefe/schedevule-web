@@ -1,5 +1,5 @@
 interface Props {
-    children: any
+    children: React.ReactNode
 }
 
 export default function Title(props: Props) {
