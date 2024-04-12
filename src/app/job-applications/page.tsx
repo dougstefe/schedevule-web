@@ -27,7 +27,6 @@ export default function Home() {
         </td>
         <td className="flex justify-evenly">
           <a href={`/job-applications/${jobApplication.id}`}>Ver</a>
-          <button>Excluir</button>
         </td>
       </tr>
     ))
