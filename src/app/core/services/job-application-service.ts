@@ -53,6 +53,20 @@ export class JobApplicationService {
     await this.delay(2000)
     return response.ok
   }
+
+  async remove(id: string): Promise<boolean> {
+    const response = await fetch(
+      `http://localhost:5959/job-applications/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'API-Key': process.env.DATA_API_KEY!,
+        }
+      }
+    )
+    await this.delay(2000)
     return response.ok
   }
+
+  delay = async (ms: number) => new Promise(res => setTimeout(res, ms));
 }
