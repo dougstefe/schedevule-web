@@ -5,9 +5,22 @@ import { JobApplication } from '../models/job-application'
 
 @injectable()
 export class JobApplicationService {
-  async add(jobApplication: JobApplication): Promise<boolean> {
+
+  async list(start: number, size: number): Promise<JobApplication[]> {
+    const response = await fetch('http://localhost:5959/job-applications/')
+    await this.delay(2000)
+    return await response.json()
+  }
+
+  async get(id: number): Promise<JobApplication> {
+    const response = await fetch(`http://localhost:5959/job-applications/${id}`)
+    await this.delay(2000)
+    return await response.json()
+  }
+
+  async add(jobApplication: JobApplication): Promise<string | undefined> {
     const response = await fetch(
-      '/api/job-applications/',
+      'http://localhost:5959/job-applications/',
       {
         method: 'POST',
         headers: {
