@@ -33,6 +33,14 @@ export default function Home() {
   }
   return (
     <Layout title="Candidaturas" toGoBack="/">
+        <div className='flex justify-end'>
+          <a href='/job-applications/new' className='flex align-center px-4 py-2 bg-indigo-900 rounded-md'>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Novo
+          </a>
+        </div>
       <table className='table-auto w-full bg-slate-300 text-indigo-900 rounded-md border-separate border-spacing-6 text-center'>
         <thead>
           <tr>
