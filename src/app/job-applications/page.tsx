@@ -1,10 +1,14 @@
-import Layout from '../components/Layout'
-import { JobApplication } from '../core/models/job-application'
+'use client';
+import "reflect-metadata"
+import { container } from 'tsyringe'
+import { useState } from 'react'
+
+import Layout from '@/app/components/Layout'
+import Loading from '../components/Loading'
 
 export default function Home() {
-  const jobApplications: JobApplication[] = [
-    new JobApplication('Itau', new Date(), 'linkedin', 'https://google.com.br', '123')
-  ];
+
+  const [loadingState, setLoadingState] = useState({ show: true })
 
   function renderTableBody() {
     if (!jobApplications.length) {
@@ -32,6 +36,7 @@ export default function Home() {
     ))
   }
   return (
+    <>
     <Layout title="Candidaturas" toGoBack="/">
         <div className='flex justify-end'>
           <a href='/job-applications/new' className='flex align-center px-4 py-2 bg-indigo-900 rounded-md'>
@@ -64,5 +69,7 @@ export default function Home() {
         </tbody>
       </table>
     </Layout>
+      <Loading show={loadingState.show} />
+    </>
   );
 }
