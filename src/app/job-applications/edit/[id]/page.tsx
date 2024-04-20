@@ -2,7 +2,7 @@
 import "reflect-metadata"
 import { container } from "tsyringe";
 import { useParams } from 'next/navigation'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 
 import Layout from '@/app/components/Layout'
 import { JobApplicationService } from '@/app/core/services/job-application-service'
@@ -12,17 +12,13 @@ import FormButtons from '@/app/components/FormButtons'
 import ConfirmationModal from '@/app/components/ConfirmationModal'
 import RedirectModal from '@/app/components/RedirectModal'
 import Loading from '@/app/components/Loading'
+import ButtonsToSave from '@/app/components/ButtonsToSave'
 
 export default function JobApplications() {
   const jobApplicationService = container.resolve(JobApplicationService);
   
-  // const router = useRouter();
-  const params = useParams()
-  const isNew = params.id === 'new'
-  const jobId = !isNew ? String(params.id) : undefined
-
-  const [loadingState, setLoadingState] = useState({ show: false })
-  const [showDialogToRemoveState, setShowDialogToRemoveState] = useState(false)
+  const [jobApplicationState, setJobApplicationState] = useState(null as unknown as JobApplication)
+  const [loadingState, setLoadingState] = useState({ show: true })
   const [redirectModalState, setRedirectModalState] = useState(
     {
       title: '',
@@ -31,33 +27,30 @@ export default function JobApplications() {
       show: false
     }
   )
-  const [changed, setChangedState] = useState(false)
-  const [jobApplicationState, setJobApplicationState] = useState(null as unknown as JobApplication)
 
-  if (!isNew){
-    if(!jobApplicationState) {
-      if (!loadingState.show) {
-        setLoadingState({ show: true })
-      }
+  const params = useParams()
+  const jobId = String(params.id)
+
+
+
+  useEffect(() => {
+    if(!jobApplicationState){
       jobApplicationService.get(Number(params.id))
         .then(x => {
           setJobApplicationState(x)
           setLoadingState({ show: false })
-        })
+        }
+      )
     }
-  }
+  }, [jobApplicationState, loadingState])
 
 
   async function save(jobApplication: JobApplication): Promise<string | boolean | undefined> {
-    if (isNew) {
-      return await jobApplicationService.add(jobApplication)
-    }
-    else {
-      return await jobApplicationService.update(jobApplication)
-    }
+    return await jobApplicationService.update(jobApplication)
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    setLoadingState({ show: true })
     event.preventDefault()
     try {
       const formData = new FormData(event.currentTarget)
@@ -68,26 +61,19 @@ export default function JobApplications() {
         String(formData.get('linkToTrackProgress')),
         jobId 
       )
-      
-      setShowDialogToRemoveState(false)
-      setLoadingState({ show: true })
-      var response = await save(jobApplication)
-      setLoadingState({ show: false })
+      var response = await jobApplicationService.update(jobApplication)
+
 
       if (!response) {
         throw new Error('Failed to submit the job application!!!')
       }
-      if (isNew) {
-        setRedirectModalState({title: 'Sucesso', text: 'Registro adicionado com sucesso.', target: `/job-applications/${response}`, show: true})
-      }
-      else {
-        setRedirectModalState({title: 'Sucesso', text: 'Registro atualizado com sucesso.', target: `/job-applications`, show: true})
-      }
-      //location.reload();
+
+      setRedirectModalState({title: 'Sucesso', text: 'Registro atualizado com sucesso.', target: `/job-applications`, show: true})
+
     } catch (error) {
       console.error(error)
     } finally {
-      // setIsLoading(false)
+      setLoadingState({ show: false })
     }
   }
 
@@ -98,26 +84,11 @@ export default function JobApplications() {
         [key]: e.target.value
       }
     )
-    setChangedState(true)
   }
 
   const cancel = () => {
     location.reload();
     console.log('canceled!!!')
-  }
-
-  const confirmToRemove = async () => {
-    setShowDialogToRemoveState(false)
-    setLoadingState({ show: true })
-    await jobApplicationService.remove(String(jobId))
-    setLoadingState({ show: false })
-    setRedirectModalState({title: 'Excluído', text: 'Registro excluído com sucesso', target: '/job-applications', show: true})
-    console.log('confirmed!!!')
-  }
-
-  const cancelRemove = () => {
-    setShowDialogToRemoveState(false)
-    console.log('confirmed!!!')
   }
 
   return (
@@ -158,14 +129,11 @@ export default function JobApplications() {
                   </div>
                 </div>
               </div>
-              <FormButtons showSaveButtons={isNew || changed} cancel={cancel} remove={() => setShowDialogToRemoveState(true)} />
+              <ButtonsToSave cancel={cancel} />
             </div>
           </div>
         </Form>
       </Layout>
-      <ConfirmationModal title="Atenção" show={showDialogToRemoveState} ok={confirmToRemove} nOk={cancelRemove}>
-        Deseja realmente excluir o registro?
-      </ConfirmationModal>
       <RedirectModal title={redirectModalState.title} show={redirectModalState.show} text={redirectModalState.text} target={redirectModalState.target} />
       <Loading show={loadingState.show} />
     </>

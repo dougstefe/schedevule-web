@@ -45,7 +45,8 @@ export default function Home() {
             {jobApplication.channel}
           </td>
           <td className="flex justify-evenly">
-            <a href={`/job-applications/${jobApplication.id}`}>Ver</a>
+            <a href={`/job-applications/details/${jobApplication.id}`}>Ver</a>
+            <a href={`/job-applications/edit/${jobApplication.id}`}>Editar</a>
           </td>
         </tr>
       ))
